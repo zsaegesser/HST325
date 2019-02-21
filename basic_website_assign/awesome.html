@@ -28,18 +28,29 @@
           font-weight: bold;
         }
         a:hover {
-          font-size: 150%;
+          color: rgb(83, 0, 61);
+        }
+        #pic1 {
+          position: relative;
         }
       </style>
 
       <script>
-
+      function change_background(){
+        document.getElementById('structure').style.backgroundImage="url('f22-raptor-png-21.png')";
+        document.getElementById('structure').style.backgroundSize = "63%";
+        document.getElementById('structure').style.height = "135%";
+      }
       </script>
     </head>
     <body>
-      <div id=structure >
+      <div id=structure onclick="change_background()">
         <div id=the_words>
           <p> <a href="https://en.wikipedia.org/wiki/Lockheed_Martin_F-35_Lightning_II"> Planes</a> <strong> are cool </strong></p>
+
+        </div>
+
+
         </div>
       </div>
     </body>
