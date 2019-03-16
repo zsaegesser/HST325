@@ -4,6 +4,7 @@
 	<title>Digital NYC template</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="style.css"></link>
 	<script src="https://2019.vizsociety.net/shared/d3/d3.v3.min.js"></script>
 	<script src="https://2019.vizsociety.net/shared/d3/topojson.v1.min.js"></script>
@@ -11,6 +12,7 @@
 	<script src="https://2019.vizsociety.net/shared/js/jquery-1.10.2.js"></script>
 	<script src="https://2019.vizsociety.net/shared/js/shared.js"></script>
 	<script src="https://2019.vizsociety.net/d3viz/lib/all.php"></script>
+
 
 	<script type="text/javascript">
 		/* Flexible D3.js global data viewer — by Alex Wellerstein, 2015-2019, v2.1 */
@@ -25,7 +27,7 @@
 			mapfile: "nyc_boroughs.json", //JSON map file
 			projection_name: "mercator", //map projection
 			projection_rotate: [73.94,-40.7,0], //centers the map
-			projection_scale: 90000, //zooms the map
+			projection_scale: 125000, //zooms the map
 			projection_translate: [960/2,window.innerHeight/2], //centers the map
 			onload: function() { //function that runs when the map is loaded
 				//this designates what the "tooltip" is going to be
@@ -49,7 +51,7 @@
 		//You can use more than one, as an array, just give it a different number (arrays count from 0, 1, 2, etc.)
 
 		//the data file constructor — used for lots of things. You can have more than one, just copy and paste and update the index.
-		var museumData = new d3Data({
+		var bikeData = new d3Data({
 			csv: "data_bikes.csv", //path to the csv file
 			latLon: function(d) { //the latLon function tells the map how to parse any latLon data in the file. you don't HAVE to do this here, but it makes it easily accessible to other visualizations.
 				return [ parseFloat(d["Lat"]), parseFloat(d["Lon"]) ] //return an array of [lat,lon] -- so indicate which fields those are
@@ -70,7 +72,7 @@
 		var circles = new dataCircles({
 			map: map, //the D3 map object (already defined above)
 
-			data: museumData, //the D3 data object (already defined above)
+			data: bikeData, //the D3 data object (already defined above)
 
 			//the class name applied to each item of data
 			data_class: "circledata",
@@ -118,8 +120,8 @@
 <body>
 	<div id="map"></div>
 	<div id="texts">
-		<div id="title">New York City Museums</div>
-		<div id="author">by Alex Wellerstein</div>
+		<div id="title">New York Circular Bike Racks</div>
+		<div id="author">by Zach Saegesser</div>
 		<hr>
 		<div id="options"></div>
 	</div>
