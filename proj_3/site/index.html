@@ -24,17 +24,100 @@
 
   .focus circle {
   fill: none;
-  stroke: steelblue;
+  stroke: Blue;
+}
+.graph {
+  width: 80%;
+  position:absolute;
+  right:0;
+}
+.options {
+  width: 20%;
+  height: 100%;
+  position:absolute;
+  left:0;
+  background-color: grey;
+}
+
+/* The container must be positioned relative: */
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
+
+/*.custom-select select {
+  display: none;
+}
+*/
+
+/*.select-selected {
+  background-color: Blue;
+}*/
+
+/* Style the arrow inside the select element: */
+/*.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}*/
+
+/* Point the arrow upwards when the select box is open (active): */
+/*.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}*/
+
+/* style the items (options), including the selected item: */
+/*.select-items div,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}*/
+
+/* Style items (options): */
+/*.select-items {
+  position: absolute;
+  background-color: Blue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}*/
+
+/* Hide the items when the select box is closed: */
+/*.select-hide {
+  display: none;
+}*/
+
+/*.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);*/
 }
 
 </style>
-<!-- Body tag is where we will append our SVG and SVG objects-->
+
 <body>
   <div class="options">
-
+    <div class="custom-select" style="width:200px;">
+      <label> "Avg Usage" </label>
+      <select id = "usage_options" onchange="populate_options_menu()">
+        <option value="1">Yearly</option>
+        <option value="12">Monthly</option>
+        <option value="365">Daily</option>
+      </select>
+      <!-- To be populated by populate_options_menu() -->
+      <select id = "usage_numbers" >
+      </select>
+    </div>
   </div>
   <div class="graph">
-    
+
   </div>
 
 </body>
@@ -42,10 +125,11 @@
 <!-- Load in the d3 library -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script>
-
+// Set up options
+populate_options_menu()
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
-  , width = window.innerWidth - margin.left - margin.right // Use the window's width
+  , width = (window.innerWidth - margin.left - margin.right) * 0.8 // Use the window's width
   , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
 
 // The number of datapoints
@@ -67,36 +151,6 @@ var line = d3.line()
     .y(function(d) { return yScale(d["ESTIMATE OF TOTAL HOURS"]); }) // set the y values for the line generator
     .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-// var dataSelect = new dataLocator({
-
-	// viz: circles, //the D3 visualization object it will act upon
-
-	//anything you add here will be added BEFORE any other data is added to the selector
-	// selector_options: [
-	// 	["Locate a museum by name...",false], //false means it will clear all classes applied
-	// ],
-  //
-	// //the field it will sort the data by for the caption -- leave blank to not sort. in this case, it is already sorted
-	// selector_sort_field: "",
-  //
-	// //how it calculates the caption
-	// selector_captions: function(d) {
-	// 	return d["name"];
-	// },
-  //
-	// selector_id: "options", //id of the HTML object you want to create the selector inside of
-  //
-	// selected_class: "selected", //class that is applied to anything selected
-  //
-	// selected_function: function(viz,d) { //a function that is triggered when something is selected
-	// 	viz.dataMouseOver(d); //in this case, tell it to act like the mouse was put over the data viz object
-//	},
-
-// });
-
-
-// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-// var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
 var dataset = 0;
 //https://2019.vizsociety.net/~zsaegess/final_project/Dataset.csv
 d3.csv("../data/full_set/Dataset.csv").then(function(data) {
@@ -108,33 +162,27 @@ d3.csv("../data/full_set/Dataset.csv").then(function(data) {
   showdata();
 });
 
-
 function showdata(){
-// 1. Add the SVG to the page and employ #2
-var svg = d3.select("body").append("svg")
+var svg = d3.select(".graph").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// 3. Call the x axis in a group tag
 svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
 
-// 4. Call the y axis in a group tag
 svg.append("g")
     .attr("class", "y axis")
     .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-// 9. Append the path, bind the data, and call the line generator
 svg.append("path")
     .datum(dataset) // 10. Binds data to the line
     .attr("class", "line") // Assign a class for styling
     .attr("d", line); // 11. Calls the line generator
 
-// 12. Appends a circle for each datapoint
 svg.selectAll(".dot")
     .data(dataset)
   .enter()
@@ -144,46 +192,46 @@ svg.selectAll(".dot")
     .attr("cy", function(d) { return yScale(d["ESTIMATE OF TOTAL HOURS"]) })
     .attr("r", 5)
       .on("mouseover", function(a, b, c) {
-  			console.log(a)
-        this.attr('class', 'focus')
+  			console.log(a);
+        this.attr('class', 'focus');
 		})
       .on("mouseout", function() {  })
-//       .on("mousemove", mousemove);
-
-//   var focus = svg.append("g")
-//       .attr("class", "focus")
-//       .style("display", "none");
-
-//   focus.append("circle")
-//       .attr("r", 4.5);
-
-//   focus.append("text")
-//       .attr("x", 9)
-//       .attr("dy", ".35em");
-
-//   svg.append("rect")
-//       .attr("class", "overlay")
-//       .attr("width", width)
-//       .attr("height", height)
-//       .on("mouseover", function() { focus.style("display", null); })
-//       .on("mouseout", function() { focus.style("display", "none"); })
-//       .on("mousemove", mousemove);
-
-//   function mousemove() {
-//     var x0 = x.invert(d3.mouse(this)[0]),
-//         i = bisectDate(data, x0, 1),
-//         d0 = data[i - 1],
-//         d1 = data[i],
-//         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-//     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
-//     focus.select("text").text(d);
-//   }
 }
 
-function init() {
-	window.debug = true; //show some information in the console
-	window.debug_verbose = false; //show a LOT of information in the console
-	d3VizObj.load(); //loads all visualization elements
+function populate_options_menu() {
+  var obj = document.getElementById("usage_numbers");
+  // var length = select.options.length;
+  // for (i = 0; i < length; i++) {
+  //   select.options[i] = null;
+  // }
+  while (obj.options.length) {
+    obj.remove(0);
 }
-window.onload = init;
+  var HOURS_RANGES = [[0, 50], [50, 100], [100, 150], [150, 200], [200, 300], [300, 400], [400, 500], [500, 700], [700, 1000], [1000, 1300], [1300, 1600], [1600]];
+  to_populate = document.getElementById('usage_numbers');
+  e = document.getElementById('usage_options')
+  divisor = e.options[e.selectedIndex].value;
+  txt = e.options[e.selectedIndex].text;
+  index = 0;
+  HOURS_RANGES.forEach(function(rnge, i) {
+
+    var opt = document.createElement("option");
+    console.log( rnge )
+    opt.value= index;
+    if (rnge.length === 1) {
+      var arg1 = rnge[0];
+      var element =  Math.round( arg1/divisor ).toString() + "+ " + txt.toString();
+    }
+    else {
+      var arg1 = rnge[0];
+      var arg2 = rnge[1];
+      var element =  Math.round( arg1/divisor ).toString() + " - "  + Math.round( arg2/divisor ).toString() + " " + txt.toString();
+
+    }
+    opt.innerHTML = element; // whatever property it has
+    to_populate.appendChild(opt);
+    index++;
+  });
+}
+
 </script>
