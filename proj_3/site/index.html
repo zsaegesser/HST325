@@ -45,78 +45,24 @@
   font-family: Arial;
 }
 
-/*.custom-select select {
-  display: none;
-}
-*/
-
-/*.select-selected {
-  background-color: Blue;
-}*/
-
-/* Style the arrow inside the select element: */
-/*.select-selected:after {
-  position: absolute;
-  content: "";
-  top: 14px;
-  right: 10px;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-  border-color: #fff transparent transparent transparent;
-}*/
-
-/* Point the arrow upwards when the select box is open (active): */
-/*.select-selected.select-arrow-active:after {
-  border-color: transparent transparent #fff transparent;
-  top: 7px;
-}*/
-
-/* style the items (options), including the selected item: */
-/*.select-items div,.select-selected {
-  color: #ffffff;
-  padding: 8px 16px;
-  border: 1px solid transparent;
-  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
-  cursor: pointer;
-}*/
-
-/* Style items (options): */
-/*.select-items {
-  position: absolute;
-  background-color: Blue;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 99;
-}*/
-
-/* Hide the items when the select box is closed: */
-/*.select-hide {
-  display: none;
-}*/
-
-/*.select-items div:hover, .same-as-selected {
-  background-color: rgba(0, 0, 0, 0.1);*/
-}
 
 </style>
 
 <body>
-  <div class="options">
+  <div class="options">console.log
     <div class="custom-select" style="width:200px;">
-      <label> "Avg Usage" </label>
+      <label> "Hours of Usage" </label>
       <select id = "usage_options" onchange="populate_options_menu()">
-        <option value="1">Yearly</option>
-        <option value="12">Monthly</option>
-        <option value="365">Daily</option>
+        <option value="1">Per Year</option>
+        <option value="12">Per Month</option>
+        <option value="365">Per Day</option>
       </select>
       <!-- To be populated by populate_options_menu() -->
       <select id = "usage_numbers" >
       </select>
     </div>
   </div>
-  <div class="graph">
+  <div class="graph" id = "graph">
 
   </div>
 
@@ -125,8 +71,9 @@
 <!-- Load in the d3 library -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script>
+var column = "ESTIMATE OF TOTAL HOURS"
 // Set up options
-populate_options_menu()
+
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width = (window.innerWidth - margin.left - margin.right) * 0.8 // Use the window's width
@@ -134,22 +81,14 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // The number of datapoints
 var n = 195;
-
 // 5. X scale will use the index of our data
 var xScale = d3.scaleLinear()
     .domain([0, n-1]) // input
     .range([0, width]); // output
-
 // 6. Y scale will use the randomly generate number
 var yScale = d3.scaleLinear()
     .domain([0, 10000000]) // input
     .range([height, 0]); // output
-
-// 7. d3's line generator
-var line = d3.line()
-    .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
-    .y(function(d) { return yScale(d["ESTIMATE OF TOTAL HOURS"]); }) // set the y values for the line generator
-    .curve(d3.curveMonotoneX) // apply smoothing to the line
 
 var dataset = 0;
 //https://2019.vizsociety.net/~zsaegess/final_project/Dataset.csv
@@ -157,47 +96,63 @@ d3.csv("../data/full_set/Dataset.csv").then(function(data) {
   data.forEach(function(d) {
     // d["ESTIMATE OF TOTAL HOURS"] = +d.total
   });
-  console.log(data[0]);
+  // console.log(data[0]);
   dataset = data;
-  showdata();
 });
 
-function showdata(){
-var svg = d3.select(".graph").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+function showdata( loc_column, divisor ){
+  // remove the old graph so it can be repopulated
+  var graphNode = document.getElementById("graph");
+  while (graphNode.firstChild) {
+    graphNode.removeChild(graphNode.firstChild);
+  }
+  column = loc_column;
+  console.log( dataset );
+  // console.log( typeof dataset )
+  var tmp_dataset = dataset;
+  // var tmp_dataset[column] = dataset.map(function(x) { return x[ column ] / 2; });
+  // console.log( tmp_dataset );
+  // 7. d3's line generator
+  var line = d3.line()
+      .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+      .y(function(d) { return yScale(d[ column ]); }) // set the y values for the line generator
+      .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
+  var svg = d3.select(".graph").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-svg.append("g")
-    .attr("class", "y axis")
-    .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
 
-svg.append("path")
-    .datum(dataset) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
-    .attr("d", line); // 11. Calls the line generator
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-svg.selectAll(".dot")
-    .data(dataset)
-  .enter()
-  .append("circle") // Uses the enter().append() method
-    .attr("class", "dot") // Assign a class for styling
-    .attr("cx", function(d, i) { return xScale(i) })
-    .attr("cy", function(d) { return yScale(d["ESTIMATE OF TOTAL HOURS"]) })
-    .attr("r", 5)
-      .on("mouseover", function(a, b, c) {
-  			console.log(a);
-        this.attr('class', 'focus');
-		})
-      .on("mouseout", function() {  })
+  svg.append("path")
+      .datum(dataset) // 10. Binds data to the line
+      .attr("class", "line") // Assign a class for styling
+      .attr("d", line); // 11. Calls the line generator
+
+  svg.selectAll(".dot")
+      .data(dataset)
+    .enter()
+    .append("circle") // Uses the enter().append() method
+      .attr("class", "dot") // Assign a class for styling
+      .attr("cx", function(d, i) { return xScale(i) })
+      .attr("cy", function(d) { return yScale(d[ column ]) })
+      .attr("r", 5)
+        .on("mouseover", function(a, b, c) {
+    			// console.log(a);
+          this.attr('class', 'focus');
+  		})
+        .on("mouseout", function() {  })
 }
-
+// ESTIMATE OF TOTAL HOURS
 function populate_options_menu() {
   var obj = document.getElementById("usage_numbers");
   // var length = select.options.length;
@@ -206,32 +161,40 @@ function populate_options_menu() {
   // }
   while (obj.options.length) {
     obj.remove(0);
-}
+  }
   var HOURS_RANGES = [[0, 50], [50, 100], [100, 150], [150, 200], [200, 300], [300, 400], [400, 500], [500, 700], [700, 1000], [1000, 1300], [1300, 1600], [1600]];
   to_populate = document.getElementById('usage_numbers');
   e = document.getElementById('usage_options')
   divisor = e.options[e.selectedIndex].value;
   txt = e.options[e.selectedIndex].text;
-  index = 0;
+  index = 1;
+  //create total option first
+  var opt = document.createElement("option");
+  opt.id = "ESTIMATE OF TOTAL HOURS";
+  opt.value = 0;
+  opt.innerHTML = "Total " + txt.toString();
+  to_populate.appendChild(opt);
+  //Loop through and create an Option for each range
   HOURS_RANGES.forEach(function(rnge, i) {
-
     var opt = document.createElement("option");
-    console.log( rnge )
     opt.value= index;
+    //create the last option 1600+
     if (rnge.length === 1) {
       var arg1 = rnge[0];
       var element =  Math.round( arg1/divisor ).toString() + "+ " + txt.toString();
     }
+    //create all the options
     else {
       var arg1 = rnge[0];
       var arg2 = rnge[1];
       var element =  Math.round( arg1/divisor ).toString() + " - "  + Math.round( arg2/divisor ).toString() + " " + txt.toString();
-
     }
     opt.innerHTML = element; // whatever property it has
     to_populate.appendChild(opt);
     index++;
   });
+  // showdata( "ESTIMATE OF TOTAL HOURS", divisor )
+  showdata( "ESTIMATE OF TOTAL HOURS" )
 }
 
 </script>
