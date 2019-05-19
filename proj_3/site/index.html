@@ -58,7 +58,10 @@
         <option value="365">Per Day</option>
       </select>
       <!-- To be populated by populate_options_menu() -->
-      <select id = "usage_numbers" >
+      <select id = "usage_numbers" onchange="change_numbers()" >
+      </select>
+      <label> "FAA Survey Year" </label>
+      <select id = "survey_year" onchange="change_survey()">
       </select>
     </div>
   </div>
@@ -73,7 +76,7 @@
 <script>
 var column = "ESTIMATE OF TOTAL HOURS"
 // Set up options
-
+populate_survey_year()
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width = (window.innerWidth - margin.left - margin.right) * 0.8 // Use the window's width
@@ -107,7 +110,7 @@ function showdata( loc_column, divisor ){
     graphNode.removeChild(graphNode.firstChild);
   }
   column = loc_column;
-  console.log( dataset );
+  // console.log( dataset );
   // console.log( typeof dataset )
   var tmp_dataset = dataset;
   // var tmp_dataset[column] = dataset.map(function(x) { return x[ column ] / 2; });
@@ -152,6 +155,41 @@ function showdata( loc_column, divisor ){
   		})
         .on("mouseout", function() {  })
 }
+
+function change_survey() {
+  var obj = document.getElementById("survey_year");
+}
+
+function change_numbers() {
+  var obj = document.getElementById("usage_numbers");
+  showdata( obj.options[obj.selectedIndex].id, 1 )
+}
+
+
+function range(start, end) {
+    var ans = [];
+    for (let i = start; i <= end; i++) {
+        ans.push(i);
+    }
+    return ans;
+}
+
+function populate_survey_year() {
+  var obj = document.getElementById("survey_year");
+
+  for( var x of range( 2002, 2017)) {
+    if (x == 2011){
+      continue
+      console.log("HIT");
+    }
+    var opt = document.createElement("option");
+    // opt.id = ;
+    opt.value = x;
+    opt.innerHTML = x.toString();
+    obj.appendChild(opt);
+    console.log("Hit it");
+  }
+}
 // ESTIMATE OF TOTAL HOURS
 function populate_options_menu() {
   var obj = document.getElementById("usage_numbers");
@@ -162,7 +200,8 @@ function populate_options_menu() {
   while (obj.options.length) {
     obj.remove(0);
   }
-  var HOURS_RANGES = [[0, 50], [50, 100], [100, 150], [150, 200], [200, 300], [300, 400], [400, 500], [500, 700], [700, 1000], [1000, 1300], [1300, 1600], [1600]];
+  // var HOURS_RANGES = [[0, 50], [50, 100], [100, 150], [150, 200], [200, 300], [300, 400], [400, 500], [500, 700], [700, 1000], [1000, 1300], [1300, 1600], [1600]];
+  var HOURS_RANGES = [[1, 50], [51, 100], [101, 150], [151, 200], [201, 300], [301, 400], [401, 500], [501, 700], [701, 1000], [1001, 1300], [1301, 1600], [1600]];
   to_populate = document.getElementById('usage_numbers');
   e = document.getElementById('usage_options')
   divisor = e.options[e.selectedIndex].value;
@@ -182,19 +221,21 @@ function populate_options_menu() {
     if (rnge.length === 1) {
       var arg1 = rnge[0];
       var element =  Math.round( arg1/divisor ).toString() + "+ " + txt.toString();
+      opt.id = "Over 1600 HOURS"
     }
     //create all the options
     else {
       var arg1 = rnge[0];
       var arg2 = rnge[1];
       var element =  Math.round( arg1/divisor ).toString() + " - "  + Math.round( arg2/divisor ).toString() + " " + txt.toString();
+      opt.id = arg1.toString() + " - "  + arg2.toString() + " HOURS"
     }
     opt.innerHTML = element; // whatever property it has
     to_populate.appendChild(opt);
     index++;
   });
   // showdata( "ESTIMATE OF TOTAL HOURS", divisor )
-  showdata( "ESTIMATE OF TOTAL HOURS" )
+  showdata( "ESTIMATE OF TOTAL HOURS", 1 )
 }
 
 </script>
