@@ -45,6 +45,20 @@
 .custom-select {
   position: relative;
   font-family: Arial;
+
+}
+
+.period label{
+  display: inline;
+  margin: 20;
+}
+.usage label{
+  display: inline;
+  margin: 20;
+}
+.survey label{
+  display: inline;
+  margin: 20;
 }
 
 
@@ -53,18 +67,26 @@
 <body>
   <div class="options">
     <div class="custom-select" style="width:200px;">
-      <label> "Hours of Usage" </label>
-      <select id = "usage_options" onchange="populate_options_menu()">
-        <option value="1">Per Year</option>
-        <option value="12">Per Month</option>
-        <option value="365">Per Day</option>
-      </select>
+      <div class="period">
+        <label> Period </label>
+        <select id = "usage_options" onchange="populate_options_menu()">
+          <option value="1">Per Year</option>
+          <option value="12">Per Month</option>
+          <option value="365">Per Day</option>
+        </select>
+      </div>
+      <div class="usage">
+        <label> Usage </label>
+        <select id = "usage_numbers" onchange="change_numbers()" >
+        </select>
+      </div>
       <!-- To be populated by populate_options_menu() -->
-      <select id = "usage_numbers" onchange="change_numbers()" >
-      </select>
-      <label> "FAA Survey Year" </label>
-      <select id = "survey_year" onchange="change_numbers()">
-      </select>
+      <div class="survey">
+        <label> FAA Survey Year </label>
+        <select id = "survey_year" onchange="change_numbers()">
+        </select>
+      </div>
+
     </div>
   </div>
   <div class="graph" id = "graph">
@@ -123,7 +145,7 @@ function showdata( loc_column, divisor, survey_year ){
   // console.log( dataset );
   // console.log( typeof dataset )
   var tmp_dataset = dataset.filter(row => row['Year of Survey'] === survey_year);
-  tmp_dataset[column] = tmp_dataset.map(function( x ) {return x[column] / divisor}) // I have no idea why this doesnt work....
+  tmp_dataset[column] = tmp_dataset.map(function( x ) {return x[column] / divisor})
   // var tmp_dataset[column] = dataset.map(function(x) { return x[ column ] / 2; });
   // console.log( tmp_dataset );
   // 7. d3's line generator
